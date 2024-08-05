@@ -17,6 +17,10 @@ def get_db(collection_name: str):
         TinyDB(file_name)
     return TinyDB(file_name)
 
+@app.get("/")
+def home():
+    return {"message" : "Working Fine"}
+
 @app.post("/domo/datastores/v1/collections/{collection_name}")
 def create_collection(collection_name: str):
     file_name = f"{collection_name}.json"
@@ -58,7 +62,7 @@ def list_documents(collection_name: str):
         for doc in documents
     ]
     
-    return {formatted_documents}
+    return formatted_documents
 
 @app.get("/domo/datastores/v1/collections/{collection_name}/documents/{document_id}")
 def get_document(collection_name: str, document_id: UUID):
@@ -77,7 +81,7 @@ def get_document(collection_name: str, document_id: UUID):
         "syncRequired": document.get("syncRequired")
     }
     
-    return {formatted_document}
+    return {"data": formatted_document}
 
 
 @app.put("/domo/datastores/v1/collections/{collection_name}/documents/{document_id}")
