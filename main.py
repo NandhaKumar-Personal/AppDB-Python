@@ -1,9 +1,10 @@
-from typing import Dict, List
-from uuid import uuid4, UUID
-from datetime import datetime
-from fastapi import FastAPI, HTTPException
+from typing import Dict
+from fastapi import FastAPI,HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from tinydb import TinyDB, Query
+from uuid import uuid4, UUID
+from datetime import datetime
 import os
 
 app = FastAPI()
@@ -16,10 +17,19 @@ def get_db(collection_name: str):
     if not os.path.exists(file_name):
         TinyDB(file_name)
     return TinyDB(file_name)
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def home():
-    return {"message" : "Working Fine"}
+    return {"user" : "nandha"}
 
 @app.post("/domo/datastores/v1/collections/{collection_name}")
 def create_collection(collection_name: str):
