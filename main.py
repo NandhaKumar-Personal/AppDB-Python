@@ -14,7 +14,6 @@ class Document(BaseModel):
 def get_db(collection_name: str):
     file_name = f"{collection_name}.json"
     if not os.path.exists(file_name):
-        # Create a new collection file if it does not exist
         TinyDB(file_name)
     return TinyDB(file_name)
 
@@ -24,7 +23,6 @@ def create_collection(collection_name: str):
     if os.path.exists(file_name):
         raise HTTPException(status_code=400, detail="Collection already exists")
     
-    # Create a new collection file
     db = TinyDB(file_name)
     return {"message": f"Collection '{collection_name}' created successfully"}
 
@@ -60,7 +58,7 @@ def list_documents(collection_name: str):
         for doc in documents
     ]
     
-    return {"data": formatted_documents}
+    return {formatted_documents}
 
 @app.get("/domo/datastores/v1/collections/{collection_name}/documents/{document_id}")
 def get_document(collection_name: str, document_id: UUID):
@@ -79,7 +77,7 @@ def get_document(collection_name: str, document_id: UUID):
         "syncRequired": document.get("syncRequired")
     }
     
-    return {"data": formatted_document}
+    return {formatted_document}
 
 
 @app.put("/domo/datastores/v1/collections/{collection_name}/documents/{document_id}")
