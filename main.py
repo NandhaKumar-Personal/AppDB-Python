@@ -18,7 +18,7 @@ def get_db(collection_name: str):
         TinyDB(file_name)
     return TinyDB(file_name)
 
-@app.post("/domo/datastores/v1/collections/{collection_name}/")
+@app.post("/domo/datastores/v1/collections/{collection_name}")
 def create_collection(collection_name: str):
     file_name = f"{collection_name}.json"
     if os.path.exists(file_name):
@@ -95,7 +95,7 @@ def update_document(collection_name: str, document_id: UUID, document: Document)
     updated_document = {
         "id": existing_document["id"],
         "createdOn": existing_document["createdOn"],
-        "updatedOn": datetime.utcnow().isoformat(),  # Update timestamp
+        "updatedOn": datetime.utcnow().isoformat(),  
         "content": document.content,
         "syncRequired": existing_document["syncRequired"]
     }
@@ -132,15 +132,34 @@ def bulk_delete_documents(collection_name: str, ids: str):
         
     return {"Deleted": deleted_count}
 
+
+@app.delete("/domo/datastores/v1/collections/{collection_name}/documents/{id}")
+def delete_documents(collection_name: str, id: str):
+    db = get_db(collection_name)
+    DocumentQuery = Query()
+    deleted_count = 0
+    result = db.remove(DocumentQuery.id == id)
+    deleted_count += result
+
+    return {"Deleted": deleted_count}
+
 @app.delete("/domo/datastores/v1/collections/{collection_name}")
 def delete_collection(collection_name: str):
     file_path = f"{collection_name}.json"
     
-    # Check if the file exists
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Collection not found")
     
-    # Remove the file
     os.remove(file_path)
     
     return {"message": "Collection deleted successfully"}
+
+
+@app.get("/domo/datastores/v1/collections")
+def list_collection():
+    if os.path:
+       files=os.listdir()
+       json_files = [file.replace(".json", "") for file in files if file.endswith('.json')]
+    print(os.path.exists)
+    
+    return {"data": json_files}
